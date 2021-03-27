@@ -1,9 +1,17 @@
+import javax.swing.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Scanner;
+import java.util.jar.JarFile;
 
 public class Main {
 
     public static void main(String[] args) {
-        int[][] graph = {{1,2}, {2,3},{3},{}};
+        int[][] graph = getGraphFromFile();
+                //{{1,2}, {2,3},{3},{}}; //
        // int[][] graph = {{1,2},{2}, {}}; //testing graphs
        // int[][]graph ={{1,3,4}, {2}, {3,4}, {4}, {}}; //testing graphs
 
@@ -183,6 +191,82 @@ public class Main {
         complexity +=2; //adding 2
 
         return complexity;
+    }
+
+    static int[][] getGraphFromFile()
+    {
+        System.out.println("Please select the file that contains the input: ");
+        JFileChooser userInput = new JFileChooser();
+
+        int result = userInput.showDialog(null, "Select");
+
+        if(result == JFileChooser.APPROVE_OPTION)
+        {
+            return parseFile(userInput.getSelectedFile()); //parseFile(userInput.getSelectedFile());
+        }
+        else
+        {
+            System.out.println("Invalid.");
+            System.exit(-1);
+        }
+
+        return null;
+    }
+
+    static int[][] parseFile(File file)
+    {
+        Scanner input;
+        int[][] parsedArray;
+        ArrayList<ArrayList<Integer>> dummyList = new ArrayList<>();
+        String dummy = "";
+        System.out.println("JE SUIS LÀ");
+        try {
+            input = new Scanner(file);
+            while(input.hasNext())
+            {
+                dummy += input.next();
+            }
+        }
+        catch (Exception e)
+        {
+            System.out.println("File not found.");
+            System.exit(-1);
+        }
+
+        ArrayList<Integer> arraySegment = new ArrayList<>();
+        while (dummy.length() != 0)
+        {
+            if(Character.isDigit(dummy.charAt(0)))
+            {
+                StringBuilder dummyInt = new StringBuilder();
+                while(Character.isDigit(dummy.charAt(0)))
+                {
+                    dummyInt.append(dummy.charAt(0));
+                    String newDummy = dummy.substring(1);
+                    dummy = newDummy;
+                }
+                arraySegment.add(Integer.parseInt(dummyInt.toString()));
+               // System.out.print(dummyInt + " ");
+
+                String newDummy = dummy.substring(1);
+                dummy = newDummy;
+            }
+            else if(dummy.charAt(0) == '}')
+            {
+                dummyList.add(arraySegment);
+                arraySegment = new ArrayList<>();
+
+                String newDummy = dummy.substring(1);
+                dummy = newDummy;
+            }
+
+            String newDummy = dummy.substring(1);
+            dummy = newDummy;
+        }
+
+        System.out.println(dummyList);
+
+            return null;
     }
 
 }
