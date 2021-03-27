@@ -3,6 +3,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.jar.JarFile;
@@ -213,60 +214,44 @@ public class Main {
         return null;
     }
 
-    static int[][] parseFile(File file)
-    {
-        Scanner input;
-        int[][] parsedArray;
-        ArrayList<ArrayList<Integer>> dummyList = new ArrayList<>();
-        String dummy = "";
-        System.out.println("JE SUIS LÀ");
-        try {
-            input = new Scanner(file);
-            while(input.hasNext())
-            {
-                dummy += input.next();
+    static int[][] parseFile(File file) {
+        ArrayList<ArrayList<Integer>> vertexArray = new ArrayList<ArrayList<Integer>>();
+        try(Scanner fileReader = new Scanner(file)){
+            while (fileReader.hasNext()){
+                String temp = fileReader.nextLine(), line = temp.substring(1, temp.length()-1);
+                vertexArray.add(new ArrayList<Integer>());
+                if(temp.length()>2){
+                    String[] connections = line.split(",");
+                    int currentIndex = vertexArray.size()-1;
+                    for (String input : connections) {
+                        try{
+                            vertexArray.get(currentIndex).add(Integer.parseInt(input));
+                        }catch (NumberFormatException e){
+                            //Ignore invalid entries
+                            continue;
+                        }
+                    }
+                }
             }
-        }
-        catch (Exception e)
-        {
-            System.out.println("File not found.");
+        }catch (Exception e){
+            System.err.println(e);
             System.exit(-1);
         }
 
-        ArrayList<Integer> arraySegment = new ArrayList<>();
-        while (dummy.length() != 0)
-        {
-            if(Character.isDigit(dummy.charAt(0)))
-            {
-                StringBuilder dummyInt = new StringBuilder();
-                while(Character.isDigit(dummy.charAt(0)))
-                {
-                    dummyInt.append(dummy.charAt(0));
-                    String newDummy = dummy.substring(1);
-                    dummy = newDummy;
-                }
-                arraySegment.add(Integer.parseInt(dummyInt.toString()));
-               // System.out.print(dummyInt + " ");
-
-                String newDummy = dummy.substring(1);
-                dummy = newDummy;
-            }
-            else if(dummy.charAt(0) == '}')
-            {
-                dummyList.add(arraySegment);
-                arraySegment = new ArrayList<>();
-
-                String newDummy = dummy.substring(1);
-                dummy = newDummy;
-            }
-
-            String newDummy = dummy.substring(1);
-            dummy = newDummy;
+        int[][] result = new int[vertexArray.size()][];
+        for (int i = 0; i != vertexArray.size(); i++) {
+            int[] arr = convertToArray(vertexArray.get(i));
+            result[i] = arr;
         }
+        return result;
+    }
 
-        System.out.println(dummyList);
-
-            return null;
+    private static int[] convertToArray(ArrayList<Integer> integers) {
+        int[] result = new int[integers.size()];
+        for(int i = 0; i != integers.size(); i++){
+            result[i] = integers.get(i);
+        }
+        return result;
     }
 
 }
